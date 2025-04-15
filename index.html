@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sentiment Analysis</title>
+  <style>
+    body { font-family: Arial; padding: 30px; background: #f4f4f4; }
+    h2 { color: #333; }
+    #output { margin-top: 20px; padding: 10px; border-radius: 5px; }
+    .positive { background-color: #d4edda; color: #155724; }
+    .neutral { background-color: #fff3cd; color: #856404; }
+    .negative { background-color: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <h2> Sentiment Analyzer</h2>
+  <textarea id="input" rows="4" cols="50" placeholder="Write something here..."></textarea><br><br>
+  <button onclick="analyze()">Analyze</button>
+  <div id="output"></div>
+
+  <script>
+    async function analyze() {
+      const text = document.getElementById("input").value;
+      const res = await fetch("http://127.0.0.1:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      const output = document.getElementById("output");
+
+      output.className = data.sentiment.toLowerCase();
+      output.innerHTML = `
+        <strong>Sentiment:</strong> ${data.sentiment}<br>
+        <strong>Confidence:</strong> ${data.confidence}<br>
+        <strong>Probabilities:</strong><br>
+        Positive: ${data.probabilities["Positive"]} <br>
+        Neutral: ${data.probabilities["Neutral"]} <br>
+        Negative: ${data.probabilities["Negative"]}
+      `;
+    }
+  </script>
+</body>
+</html>
